@@ -31,6 +31,7 @@ bin/
 
 ### Files ###
 .idea/
+test/
 projekat.iml
 KDP_PROJEKAT_2023_Jun_test.zip
 KDP_JavniTestovi.pdf
