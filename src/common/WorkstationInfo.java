@@ -45,7 +45,7 @@ public class WorkstationInfo implements Serializable {
 
     public synchronized int getActiveJobsCount() { return activeJobsCount; }
     public synchronized long getLastHeartbeatTime() { return lastHeartbeatTime; }
-    public synchronized void setHeartbeatTime(long time) { this.lastHeartbeatTime = time; }
+    public synchronized void setLastHeartbeatTime(long time) { this.lastHeartbeatTime = time; }
     public synchronized boolean isAlive() { return isAlive; }
     public synchronized void setAlive(boolean alive) { this.isAlive = alive; }
 
