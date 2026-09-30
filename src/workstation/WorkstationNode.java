@@ -103,11 +103,11 @@ public class WorkstationNode implements Runnable {
                 out.flush();
                 socket.close();
             } else if (msg.getType() == MessageType.DISPATCH_JOB) {
-                Job job = (Job) in.readObject();
+                Job job = (Job) msg.getData();
                 System.out.println("WorkstationNode: Received job: " + job.getJobId());
 
                 File jobDir = new File(storageDir, "job_" + job.getJobId());
-                if (!jobDir.exists()) jobDir.mkdir();
+                if (!jobDir.exists()) jobDir.mkdirs();
 
                 FileTransferUtil.receiveFile(in, jobDir);
 

@@ -59,7 +59,7 @@ public class JobManager {
 
     public synchronized void updateJobStatus(String jobId, JobStatus newStatus, String workstationId) {
         Job job = allJobs.get(jobId);
-        if (job == null) {
+        if (job != null) {
             job.setStatus(newStatus);
             if (workstationId != null) {
                 job.setAssignedWorkstationId(workstationId);

@@ -57,7 +57,6 @@ public class ClientMain {
                         ConfigFileParser.ParsedConfig config = ConfigFileParser.parse(new File(configPath), clientId);
                         String jobId = clientService.submitJob(config.job, config.jarFile, config.inputFiles);
                         System.out.println("Job " + jobId + " successfully submitted");
-                        System.out.println("You can leave this window");
                     } catch (Exception e) {
                         System.err.println("Failed to parse config file: " + e.getMessage());
                     }

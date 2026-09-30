@@ -158,7 +158,7 @@ public class CentralServer implements Runnable {
         }
 
         jobManager.updateJobStatus(finishedJob.getJobId(), JobStatus.DONE, finishedJob.getAssignedWorkstationId());
-        Job localJob = jobManager.getJob(finishedJob.getAssignedWorkstationId());
+        Job localJob = jobManager.getJob(finishedJob.getJobId());
         if (localJob != null) {
             localJob.setExecutionLog(finishedJob.getExecutionLog());
             localJob.setExitCode(finishedJob.getExitCode());
