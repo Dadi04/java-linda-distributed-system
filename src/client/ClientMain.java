@@ -114,6 +114,25 @@ public class ClientMain {
     }
 
     private static void handleBatchCommands(String[] args, ClientService clientService, String clientId) {
-
+        String command = args[2];
+        try {
+            if ("submit".equalsIgnoreCase(command) && args.length >= 4) {
+                File configFile = new File(args[3]);
+                ConfigFileParser.ParsedConfig config = ConfigFileParser.parse(configFile, clientId);
+                String jobId = clientService.submitJob(config.job, config.jarFile, config.inputFiles);
+                System.out.println("Job " + jobId + " successfully submitted");
+            } else if ("status".equalsIgnoreCase(command) && args.length >= 4) {
+                Job job = clientService.getJobStatus(args[3]);
+                System.out.println("Status of job " + job.getJobId() + ": " + job.getStatus());
+            } else if ("results".equalsIgnoreCase(command) && args.length >= 4) {
+                String jobId = args[3];
+                String dir = args.length >= 5 ? args[4] : "downloads";
+                Job job = clientService.downloadResults(jobId, new File(dir));
+                System.out.println("Job " + jobId + " successfully downloaded to: " + dir);
+            }
+        } catch (Exception e) {
+            System.err.println("Failed to parse config file: " + e.getMessage());
+            System.exit(1);
+        }
     }
 }
