@@ -16,10 +16,7 @@ import java.util.concurrent.Executors;
 
 public class CentralServer implements Runnable {
     private final int serverPort;
-    private final int lindaPort;
-    private final File storagePort;
 
-    private final TupleSpace tupleSpace;
     private final LindaService lindaService;
     private final JobManager jobManager;
     private final WorkstationManager workstationManager;
@@ -31,11 +28,8 @@ public class CentralServer implements Runnable {
 
     public CentralServer(int serverPort, int lindaPort, File storageDir) {
         this.serverPort = serverPort;
-        this.lindaPort = lindaPort;
-        this.storagePort = storageDir;
 
-        this.tupleSpace = new TupleSpace();
-        this.lindaService = new LindaService(lindaPort, tupleSpace);
+        this.lindaService = new LindaService(lindaPort, new TupleSpace());
 
         this.workstationManager = new WorkstationManager(this::handleWorkstationFailure);
         this.jobManager = new JobManager(storageDir);
@@ -92,6 +86,9 @@ public class CentralServer implements Runnable {
                     jobManager.updateJobStatus(failedJob.getJobId(), JobStatus.FAILED, failedJob.getAssignedWorkstationId());
                     WorkstationInfo wsFailed = workstationManager.getWorkstation(failedJob.getAssignedWorkstationId());
                     if (wsFailed != null) wsFailed.decrementActiveJobsCount();
+
+                    out.writeObject(new Message(MessageType.SERVER_RESPONSE_OK, "Failure recorded"));
+                    out.flush();
                     break;
                 }
                 case CLIENT_SUBMIT_JOB: {
@@ -193,7 +190,7 @@ public class CentralServer implements Runnable {
         File outputDir = jobManager.getJobOutputDirectory(jobId);
         for (String outputFileName : job.getExpectedOutputs()) {
             File outFile = new File(outputDir, outputFileName);
-            if (outFile.exists()) {
+            if (outFile.exists()) { // potential problem if output file doesn't exist
                 FileTransferUtil.sendFile(outFile, out);
             }
         }

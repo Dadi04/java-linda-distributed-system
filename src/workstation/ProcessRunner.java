@@ -29,7 +29,7 @@ public class ProcessRunner {
         File userJar = new File(jobDir, job.getJarFileName());
         String classpath = userJar.getAbsolutePath();
         if (lindaJarFile != null && lindaJarFile.exists()) {
-            classpath += File.separator + lindaJarFile.getAbsolutePath();
+            classpath += File.pathSeparator + lindaJarFile.getAbsolutePath();
         }
         commandList.add("-cp");
         commandList.add(classpath);

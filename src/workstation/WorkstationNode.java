@@ -84,7 +84,7 @@ public class WorkstationNode implements Runnable {
             out.flush();
 
             Message ack = (Message) in.readObject();
-            System.out.println("WorkstationNode: Received ACK from Central Server: " + ack.getDescription());
+            System.out.println("WorkstationNode: Received ACK from Central Server: " + ack.getData());
         } catch (Exception e) {
             System.err.println("WorkstationNode: Error while registering on central server: " + e.getMessage());
         }
@@ -162,7 +162,7 @@ public class WorkstationNode implements Runnable {
             }
 
             Message ack = (Message) in.readObject();
-            System.out.println("WorkstationNode: Received ACK from Central Server: " + ack.getDescription());
+            System.out.println("WorkstationNode: Received ACK from Central Server: " + ack.getData());
         } catch (Exception e) {
             System.err.println("WorkstationNode: Error while reporting job completion: " + e.getMessage());
         }
@@ -178,6 +178,9 @@ public class WorkstationNode implements Runnable {
 
             out.writeObject(new Message(MessageType.JOB_EXECUTION_FAILED, job));
             out.flush();
+
+            Message ack = (Message) in.readObject();
+            System.out.println("WorkstationNode: Received ACK from Central Server: " + ack.getData());
         } catch (Exception ignored) {}
     }
 
