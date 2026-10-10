@@ -33,10 +33,10 @@ public class JobScheduler implements Runnable {
                     if (job != null) {
                         dispatchJobToWorkstation(job, freeWorkstation);
                     } else {
-                        Thread.sleep(1000);
+                        Thread.sleep(Constants.SCHEDULER_POLL_INTERVAL_MS);
                     }
                 } else {
-                    Thread.sleep(1000);
+                    Thread.sleep(Constants.SCHEDULER_POLL_INTERVAL_MS);
                 }
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();

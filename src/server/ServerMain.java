@@ -7,8 +7,8 @@ import java.io.File;
 public class ServerMain {
     public static void main(String[] args) {
         int serverPort = Constants.DEFAULT_SERVER_PORT;
-        int lindaPort = 9001;
-        String storagePath = "server_storage";
+        int lindaPort = Constants.DEFAULT_LINDA_PORT;
+        String storagePath = Constants.DEFAULT_SERVER_STORAGE_DIR;
 
         if (args.length >= 1) {
             try {

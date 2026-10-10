@@ -6,11 +6,11 @@ import java.io.File;
 
 public class WorkstationMain {
     public static void main(String[] args) {
-        String serverHost = "localhost";
+        String serverHost = Constants.DEFAULT_SERVER_HOST;
         int serverPort = Constants.DEFAULT_SERVER_PORT;
-        int workstationPort = 9100;
-        int maxParallelJobs = 2;
-        String lindaJarPath = "lib/linda.jar";
+        int workstationPort = Constants.DEFAULT_WORKSTATION_PORT;
+        int maxParallelJobs = Constants.DEFAULT_MAX_PARALLEL_JOBS;
+        String lindaJarPath = Constants.DEFAULT_LINDA_JAR_PATH;
 
         if (args.length >= 1) {
             serverHost = args[0];
@@ -40,10 +40,10 @@ public class WorkstationMain {
             lindaJarPath = args[4];
         }
 
-        File storageDir = new File("workstation_storage_" + workstationPort);
+        File storageDir = new File(Constants.DEFAULT_WORKSTATION_STORAGE_PREFIX + workstationPort);
         File lindaJarFile = new File(lindaJarPath);
 
-        System.out.println("Workstation ID: WS-" + workstationPort);
+        System.out.println("Workstation ID: " + Constants.WORKSTATION_ID_PREFIX + workstationPort);
         System.out.println("Central server address: " + serverHost + ":" + serverPort);
         System.out.println("Local port: " + workstationPort);
         System.out.println("Parallel jobs capacity: " + maxParallelJobs);

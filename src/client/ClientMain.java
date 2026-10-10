@@ -1,6 +1,5 @@
 package client;
 
-import com.sun.security.auth.login.ConfigFile;
 import common.Constants;
 import common.Job;
 
@@ -9,7 +8,7 @@ import java.util.Scanner;
 
 public class ClientMain {
     public static void main(String[] args) {
-        String serverHost = "localhost";
+        String serverHost = Constants.DEFAULT_SERVER_HOST;
         int serverPort = Constants.DEFAULT_SERVER_PORT;
 
         if (args.length >= 2) {
@@ -22,7 +21,7 @@ public class ClientMain {
         }
 
         ClientService clientService = new ClientService(serverHost, serverPort);
-        String clientId = "Client-" + System.currentTimeMillis() % 10000;
+        String clientId = Constants.CLIENT_ID_PREFIX + System.currentTimeMillis() % 10000;
 
         if (args.length >= 3) {
             handleBatchCommands(args, clientService, clientId);
@@ -81,7 +80,7 @@ public class ClientMain {
                     String resultId = scanner.nextLine().trim();
                     System.out.print("Folder for downloads (default: downloads): ");
                     String downloadDirStr = scanner.nextLine().trim();
-                    if (downloadDirStr.isEmpty()) downloadDirStr = "downloads";
+                    if (downloadDirStr.isEmpty()) downloadDirStr = Constants.DEFAULT_CLIENT_DOWNLOAD_DIR;
 
                     try {
                         File downloadDir = new File(downloadDirStr);
@@ -126,7 +125,7 @@ public class ClientMain {
                 System.out.println("Status of job " + job.getJobId() + ": " + job.getStatus());
             } else if ("results".equalsIgnoreCase(command) && args.length >= 4) {
                 String jobId = args[3];
-                String dir = args.length >= 5 ? args[4] : "downloads";
+                String dir = args.length >= 5 ? args[4] : Constants.DEFAULT_CLIENT_DOWNLOAD_DIR;
                 Job job = clientService.downloadResults(jobId, new File(dir));
                 System.out.println("Job " + jobId + " successfully downloaded to: " + dir);
             }

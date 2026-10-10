@@ -1,5 +1,6 @@
 package workstation;
 
+import common.Constants;
 import common.Job;
 
 import java.io.BufferedReader;
@@ -57,12 +58,12 @@ public class ProcessRunner {
             String line;
             while ((line = reader.readLine()) != null) {
                 logBuilder.append(line).append("\n");
-                System.out.println("Job-" + job.getJobId() + ": " + line);
+                System.out.println(Constants.JOB_ID_PREFIX + job.getJobId() + ": " + line);
             }
         }
 
         int exitCode = process.waitFor();
-        System.out.println("Job-" + job.getJobId() + " finished with exit code: " + exitCode);
+        System.out.println(Constants.JOB_ID_PREFIX + job.getJobId() + " finished with exit code: " + exitCode);
 
         job.setExecutionLog(logBuilder.toString());
         job.setExitCode(exitCode);

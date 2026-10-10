@@ -19,8 +19,8 @@ public class ClientService {
     private Socket createSocket() throws IOException {
         Socket socket = new Socket();
 
-        socket.connect(new InetSocketAddress(serverHost, serverPort), 5000);
-        socket.setSoTimeout(10000);
+        socket.connect(new InetSocketAddress(serverHost, serverPort), Constants.CLIENT_CONNECT_TIMEOUT_MS);
+        socket.setSoTimeout(Constants.CLIENT_SO_TIMEOUT_MS);
         return socket;
     }
 

@@ -32,7 +32,7 @@ public class WorkstationNode implements Runnable {
         this.storageDir = storageDir;
         this.lindaJarFile = lindaJarFile;
 
-        this.workstationId = "WS-" + workstationPort;
+        this.workstationId = Constants.WORKSTATION_ID_PREFIX + workstationPort;
         this.jobThreadPool = Executors.newFixedThreadPool(maxParallelJobs);
 
         if (!storageDir.exists()) {

@@ -85,7 +85,7 @@ public class ConfigFileParser {
             }
         }
 
-        String jobId = "JOB-" + System.currentTimeMillis();
+        String jobId = Constants.JOB_ID_PREFIX + System.currentTimeMillis();
 
         Job job = new Job(jobId, clientId, command, jarFile.getName(), inputNames, outputNames);
 
