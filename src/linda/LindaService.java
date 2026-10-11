@@ -15,9 +15,16 @@ public class LindaService implements Runnable{
     private ServerSocket serverSocket;
     private final ExecutorService threadPool = Executors.newCachedThreadPool();
 
-    public LindaService(int port, TupleSpace tupleSpace) {
+    public interface EvalDispatcher {
+        void dispatchEval(String taskName, Runnable runnable);
+    }
+
+    private final EvalDispatcher evalDispatcher;
+
+    public LindaService(int port, TupleSpace tupleSpace, EvalDispatcher evalDispatcher) {
         this.port = port;
         this.tupleSpace = tupleSpace;
+        this.evalDispatcher = evalDispatcher;
     }
 
     @Override
@@ -99,7 +106,12 @@ public class LindaService implements Runnable{
     }
 
     private void handleEval(String name, Runnable runnable) {
-         new Thread(runnable, "Eval-" + name).start();
+         System.out.println("LindaService: Received EVAL request: " + name + ". Delegating to the workstations...");
+         if (evalDispatcher != null) {
+             evalDispatcher.dispatchEval(name, runnable);
+         } else {
+             System.out.println("LindaService: EvalDispatcher not assigned");
+         }
     }
 
     public void stop() {

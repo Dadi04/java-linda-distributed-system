@@ -120,6 +120,25 @@ public class WorkstationNode implements Runnable {
                 socket.close();
 
                 jobThreadPool.submit(() -> executeJob(job, jobDir));
+            } else if (msg.getType() == MessageType.DISPATCH_EVAL_JOB) {
+                EvalTask evalTask = (EvalTask) msg.getData();
+                System.out.println("WorkstationNode: Received EVAL task: " + evalTask.getTaskName());
+
+                out.writeObject(new Message(MessageType.JOB_STARTED, evalTask.getTaskId()));
+                out.flush();
+                socket.close();
+
+                jobThreadPool.submit(() -> {
+                    try {
+                        System.out.println("WorkstationNode: Executing EVAL task: " + evalTask.getTaskName());
+                        evalTask.getRunnable().run();
+                        System.out.println("WorkstationNode: Finished executing EVAL task: " + evalTask.getTaskName());
+                    } catch (Throwable t) {
+                        System.err.println("WorkstationNode: Error while executing EVAL task: " + evalTask.getTaskName() + ": " + t.getMessage());
+                    } finally {
+                        notifyServerEvalFinished(evalTask);
+                    }
+                });
             }
         } catch (Exception e) {
             System.err.println("WorkstationNode: Error while handling Incoming Connection: " + e.getMessage());
@@ -182,6 +201,20 @@ public class WorkstationNode implements Runnable {
             Message ack = (Message) in.readObject();
             System.out.println("WorkstationNode: Received ACK from Central Server: " + ack.getData());
         } catch (Exception ignored) {}
+    }
+
+    private void notifyServerEvalFinished(EvalTask task) {
+        try (Socket socket = new Socket(serverHost, serverPort);
+             ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+             ObjectInputStream in = new ObjectInputStream(socket.getInputStream())) {
+
+            out.writeObject(new Message(MessageType.EVAL_TASK_COMPLETED, workstationId));
+            out.flush();
+
+            in.readObject(); // ACK
+        } catch (Exception e) {
+            System.err.println("WorkstationNode: Error while notifying server EVAL task: " + e.getMessage());
+        }
     }
 
     public void stop() {

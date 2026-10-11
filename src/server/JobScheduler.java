@@ -26,13 +26,13 @@ public class JobScheduler implements Runnable {
 
         while (running) {
             try {
-                WorkstationInfo freeWorkstation = workstationManager.findAvailableWorkstation();
-
-                if (freeWorkstation != null) {
-                    Job job = jobManager.pollNextReadyJob();
-                    if (job != null) {
+                Job job = jobManager.pollNextReadyJob();
+                if (job != null) {
+                    WorkstationInfo freeWorkstation = workstationManager.acquireAvailableWorkstation();
+                    if (freeWorkstation != null) {
                         dispatchJobToWorkstation(job, freeWorkstation);
                     } else {
+                        jobManager.requeueJob(job);
                         Thread.sleep(Constants.SCHEDULER_POLL_INTERVAL_MS);
                     }
                 } else {

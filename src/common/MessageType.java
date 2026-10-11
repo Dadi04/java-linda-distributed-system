@@ -9,10 +9,12 @@ public enum MessageType implements Serializable {
     JOB_STARTED,
     JOB_COMPLETED,
     JOB_EXECUTION_FAILED,
+    EVAL_TASK_COMPLETED,
 
     // server -> workstation
     HEARTBEAT_PING,
     DISPATCH_JOB,
+    DISPATCH_EVAL_JOB,
 
     // client -> server
     CLIENT_SUBMIT_JOB,

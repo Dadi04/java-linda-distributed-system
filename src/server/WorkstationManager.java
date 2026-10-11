@@ -47,6 +47,16 @@ public class WorkstationManager {
         return null;
     }
 
+    public synchronized WorkstationInfo acquireAvailableWorkstation() {
+        for (WorkstationInfo wsi : workstations.values()) {
+            if (wsi.hasAvailableCapacity()) {
+                wsi.incrementActiveJobsCount();
+                return wsi;
+            }
+        }
+        return null;
+    }
+
     public List<WorkstationInfo> getAllWorkstations() { return new ArrayList<>(workstations.values()); }
     public WorkstationInfo getWorkstation(String id) { return workstations.get(id); }
 

@@ -29,7 +29,7 @@ public class CentralServer implements Runnable {
     public CentralServer(int serverPort, int lindaPort, File storageDir) {
         this.serverPort = serverPort;
 
-        this.lindaService = new LindaService(lindaPort, new TupleSpace());
+        this.lindaService = new LindaService(lindaPort, new TupleSpace(), this::handleDistributedEval);
 
         this.workstationManager = new WorkstationManager(this::handleWorkstationFailure);
         this.jobManager = new JobManager(storageDir);
@@ -88,6 +88,15 @@ public class CentralServer implements Runnable {
                     if (wsFailed != null) wsFailed.decrementActiveJobsCount();
 
                     out.writeObject(new Message(MessageType.SERVER_RESPONSE_OK, "Failure recorded"));
+                    out.flush();
+                    break;
+                }
+                case EVAL_TASK_COMPLETED: {
+                    String wId = (String) msg.getData();
+                    WorkstationInfo workstationInfo = workstationManager.getWorkstation(wId);
+                    if (workstationInfo != null) workstationInfo.decrementActiveJobsCount();
+
+                    out.writeObject(new Message(MessageType.SERVER_RESPONSE_OK, "EVAL slot freed"));
                     out.flush();
                     break;
                 }
@@ -194,6 +203,42 @@ public class CentralServer implements Runnable {
                 FileTransferUtil.sendFile(outFile, out);
             }
         }
+    }
+
+    private void handleDistributedEval(String taskName, Runnable runnable) {
+        clientPool.submit(() -> {
+            try {
+                WorkstationInfo freeWorkstation = null;
+                while (freeWorkstation == null && running) {
+                    freeWorkstation = workstationManager.acquireAvailableWorkstation();
+                    if (freeWorkstation == null) {
+                        Thread.sleep(Constants.SCHEDULER_POLL_INTERVAL_MS);
+                    }
+                }
+
+                if (!running || freeWorkstation == null) return;
+
+                String taskId = "EVAL-" + System.currentTimeMillis();
+                EvalTask task = new EvalTask(taskId, taskName, runnable);
+
+                System.out.println("CentralServer: Sending EVAL task " + taskName + " to workstation " + freeWorkstation.getId());
+
+                try (Socket socket = new Socket(freeWorkstation.getHost(), freeWorkstation.getPort());
+                ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+                ObjectInputStream in = new ObjectInputStream(socket.getInputStream())) {
+                    out.writeObject(new Message(MessageType.DISPATCH_EVAL_JOB, task));
+                    out.flush();
+
+                    Message ack = (Message) in.readObject();
+                    System.out.println("CentralServer: Workstation " + freeWorkstation.getId() + " accepted EVAL task: " + ack.getData());
+                } catch (Exception e) {
+                    System.err.println("CentralServer: Error while sending EVAL task: " + e.getMessage());
+                    freeWorkstation.decrementActiveJobsCount();
+                }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        });
     }
 
     public void stop() {
